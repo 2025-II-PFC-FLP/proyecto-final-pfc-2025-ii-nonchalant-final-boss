@@ -3,10 +3,38 @@
  */
 package taller
 
-object App {
-  def main(args: Array[String]): Unit = {
-    println(greeting())
-  }
+object App{
+  def greeting(): String = "hola"
 
-  def greeting(): String = "Hello, world!"
+  def main(args: Array[String]): Unit = {
+    println("Proyecto de riego óptimo - Comparación secuencial vs paralelo")
+
+    val tamanos = Vector(6, 7)
+
+    println("\nTabla comparativa de tiempos (ProgramacionRiegoOptimo)")
+    println("Tamaño finca\tSecuencial (ms)\tParalelo (ms)\tAceleración (%)")
+
+    tamanos.foreach { n =>
+      val finca = ModeloRiego.fincaAlAzar(n)
+      val distancias = ModeloRiego.distanciaAlAzar(n)
+
+      // tiempo secuencial
+      val inicioSeq = System.nanoTime()
+      val _ = RiegoSecuencial.ProgramacionRiegoOptimo(finca, distancias)
+      val finSeq = System.nanoTime()
+      val tiempoSeqMs = (finSeq - inicioSeq) / 1e6
+
+      //tiempo paralelo
+      val inicioPar = System.nanoTime()
+      val _ = RiegoParalelo.ProgramacionRiegoOptimoPar(finca, distancias)
+      val finPar = System.nanoTime()
+      val tiempoParMs = (finPar - inicioPar) / 1e6
+
+      val aceleracion =
+        if (tiempoParMs == 0) 0.0
+        else ((tiempoSeqMs - tiempoParMs) / tiempoParMs) * 100.0
+
+      println(f"$n\t\t$tiempoSeqMs%.2f\t\t$tiempoParMs%.2f\t\t$aceleracion%.2f")
+    }
+  }
 }
